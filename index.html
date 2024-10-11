@@ -1,372 +1,304 @@
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
-		/>
-		<title>黎念Rene</title>
-        <link href=" https://cdn.jsdelivr.net/npm/element-plus@2.7.8/dist/index.min.css" rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/vue@3.4.35/dist/vue.global.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/element-plus@2.7.8/dist/index.full.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
-		<style>
-			.el-row {
-				padding: 20px;
-			}
-			.el-col:first-child {
-				margin-right: 20px;
-			}
-			.song-item {
-				margin: 0 8px 10px 0;
-    			white-space: break-spaces;
-			}
-			.song-list {
-				display: block;
-				border: 1px solid gray;
-				border-radius: 20px;
-				margin-bottom: 20px;
-			}
-			.song-low {
-				min-width: 80px;
-			}
-			.song-list .el-card__body {
-    			padding: 20px 15px 10px 15px;
-			}
-			.el-tag{
-			    justify-content: flex-start;
-			    height: unset;
-			    padding: 5px 0 5px 9px;
-			}
-			body {
-				background-image: linear-gradient(
-					45deg,
-					#fffcfd 25%,
-					#F0F9EB 25%,
-					#F0F9EB 50%,
-					#fffcfd 50%,
-					#fffcfd 75%,
-					#F0F9EB 75%,
-					#F0F9EB 100%
-				);
-				background-size: 56.57px 56.57px;
-			}
-			@media screen and (orientation: landscape) {
-				#app {
-					width: 51%;
-					margin: 0 auto;
-				}
-			}
-			.slogan {
-				margin: 10 auto;
-				background-image:url(./黎念_background.png.jpg);
-				background-repeat: no-repeat;
-				background-size:100%;
-				height:400px;
-				margin-bottom:0px;
-			}
-			.logo {
-				text-shadow: 1px 1px 2px black;
-				color: white;
-				font-size:70px;
-				font-weight: bolder;
-			}
-			.logo-cn {
-				text-shadow: 1px 1px 2px black;
-				color: #7CBEBC;
-				font-size: 36px;
-				font-weight: bolder;
-				text-align: right;
-			}
-			.el-tag.el-tag--success {
-			    --el-tag-text-color:  #62B2AD;
-			}
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歌曲歌单</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        #songList {
+            list-style-type: none;
+            padding: 0;
+        }
+        .songButton {
+            background: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 5px;
+            flex: 1 0 18%; /* 每行五首歌 */
+        }
+        .songButton:hover {
+            background-color: #e0e0e0;
+        }
+        .checkbox {
+            margin-right: 5px;
+        }
+        .moveButton {
+            margin-top: 10px;
+            padding: 10px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .moveButton:hover {
+            background-color: #0056b3;
+        }
+        .moveContainer {
+            display: none;
+            margin-top: 10px;
+        }
+        .songRow {
+            display: flex;
+            flex-wrap: wrap; /* 允许换行 */
+            margin-bottom: 10px; /* 每组之间的间距 */
+        }
+        .songCategory {
+            margin-bottom: 20px; /* 分类之间的间距 */
+        }
+    </style>
+</head>
+<body>
 
+    <h1>我的歌曲歌单</h1>
+    <div id="addSongForm">
+        <input type="text" id="songInput" placeholder="输入歌曲名称">
+        <button onclick="addSong()">添加歌曲</button>
+        <input type="file" id="fileInput" accept=".txt" onchange="loadSongsFromFile(event)">
+    </div>
 
-		</style>
-	</head>
-	<body  class="example">
-		<div id="app" class="example">
-			<el-card class="slogan">
-				<div class="logo"></div>
-				<div class="logo-cn">黎念_Rene</div>
-			</el-card>
-			<el-card v-for="i in 5" class="song-list">
-				<div :ref="i == 1 ? `songListRef${i}` : ''" :style="{height: (ceil(songzh[`s${i}`].length / floor(wwidth/iw)) * ih) + 'px'}" style="display: flex;flex-direction: column;flex-wrap: wrap;">
-					<el-tag
-						v-for="item in songzh[`s${i}`]"
-						class="song-item song-low"
-						disable-transitions
-						type="success"
-					>
-						{{item}}
-					</el-tag>
-				</div>
-			</el-card>
-			<el-card class="song-list">
-				<div :style="{height: (ceil(songzh.so.length / floor(wwidth/120)) * ih + 30) + 'px'}" style="display: flex;flex-direction: column;flex-wrap: wrap;">
-					<el-tag
-						v-for="item in songzh.so"
-						class="song-item"
-						disable-transitions
-						type="success"
-					>
-						{{item}}
-					</el-tag>
-				</div>
-			</el-card>
-			<el-card class="song-list" v-if="english.length">
-				<div :style="{height: (ceil(songzh.so.length / floor(wwidth/120)) * ih) + 'px'}" style="display: flex;flex-direction: column;flex-wrap: wrap;">
-					<el-tag class="song-item" v-for="item in english" disable-transitions
-						type="success">
-						{{item}}
-					</el-tag>
-				</div>
-			</el-card>
-		</div>
-	</body>
-	<script type="module">
-		const { createApp, ref, onMounted, watch } = Vue
-		const app = Vue.createApp({
-			setup() {
-				window.songs = {
-					zhcn: [
-                    '哆啦A梦之歌',
-					'恋爱循环',
-					'偶阵雨',
-					'スピカ (Spica)',
-					'金曜日のおはよう',
-					'恋爱循环',
-					'白金ディスコ',
-					'アイドル',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					''],
-					english: [
-     				''
-     ]
-				}
-				const { max, floor, ceil } = _
-				const english = _.uniq(window.songs.english).sort()
-				const zhcn = _.uniq(window.songs.zhcn)
-				const songzh = {}
-				for(let i=1;i<=5;i++) songzh[`s${i}`] = zhcn.filter(c => c.length === i).sort((a,b) => a.localeCompare(b,'zh'))
-				songzh.so = zhcn.filter(c => c.length > 5).sort((a,b) => a.localeCompare(b,'zh'))
-				const ih = 34
-				const iw = 88
-				const songListRef1 = ref()
-				const wwidth = ref(0)
+    <button onclick="toggleMoveContainer()" class="moveButton">移动选中歌曲</button>
+    <div id="moveContainer" class="moveContainer">
+        <label for="moveSelect">选择目标分类:</label>
+        <select id="moveSelect">
+            <option value="">选择目标分类...</option>
+            <option value="中文歌">中文歌</option>
+            <option value="英文歌">英文歌</option>
+            <option value="日文歌">日文歌</option>
+        </select>
+        <button onclick="moveSelectedSongs()">确认移动</button>
+    </div>
 
-				onMounted(() => {
-					const {offsetWidth:s1w,offsetHeight:s1h} = songListRef1.value[0]
-					wwidth.value = s1w
-				})
-				return {
-					wwidth,
-					songzh,
-					english,
-					zhcn,
-					max,
-					floor,
-					ceil,
-					songListRef1,
-					iw,
-					ih
-				}
-			}
-		})
-		app.use(ElementPlus).mount('#app')
-	</script>
+    <label for="viewOption">查看选项:</label>
+    <select id="viewOption" onchange="displaySongs()">
+        <option value="all">查看所有歌曲</option>
+        <option value="chinese">只查看中文歌</option>
+    </select>
+
+    <button onclick="exportSongs()" class="moveButton">导出歌曲</button>
+
+    <ul id="songList"></ul>
+
+    <script>
+        const songs = {
+            "中文歌": {},
+            "英文歌": [],
+            "日文歌": []
+        };
+
+        function addSong() {
+            const songInput = document.getElementById('songInput');
+            const songName = songInput.value.trim();
+
+            if (songName) {
+                const category = detectLanguage(songName);
+                addSongToCategory(songName, category);
+                displaySongs();
+                songInput.value = ''; // 清空输入框
+            } else {
+                alert('请输入歌曲名称');
+            }
+        }
+
+        function detectLanguage(songName) {
+            const chineseRegex = /[\u4e00-\u9fa5]/; // 中文字符范围
+            const englishRegex = /^[A-Za-z\s]+$/; // 英文字母
+            const japaneseRegex = /[\u3040-\u30ff\u4e00-\u9faf]/; // 日文字符范围
+
+            if (chineseRegex.test(songName)) {
+                return "中文歌";
+            } else if (englishRegex.test(songName)) {
+                return "英文歌";
+            } else if (japaneseRegex.test(songName)) {
+                return "日文歌";
+            } else {
+                return "未知语言"; // 如果不符合任何语言
+            }
+        }
+
+        function loadSongsFromFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const contents = e.target.result;
+                    const lines = contents.split('\n');
+                    lines.forEach(line => {
+                        const songName = line.trim();
+                        if (songName) {
+                            const category = detectLanguage(songName);
+                            addSongToCategory(songName, category);
+                        }
+                    });
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function addSongToCategory(songName, category) {
+            if (category === "中文歌") {
+                const length = songName.length > 7 ? '多字' : songName.length;
+                if (!songs[category][length]) {
+                    songs[category][length] = [];
+                }
+                songs[category][length].push(songName);
+            } else if (category !== "未知语言") {
+                songs[category].push(songName);
+            }
+            displaySongs();
+        }
+
+        function displaySongs() {
+            const songList = document.getElementById('songList');
+            songList.innerHTML = ''; // 清空列表
+            const viewOption = document.getElementById('viewOption').value;
+
+            for (const category in songs) {
+                if (viewOption === "chinese" && category !== "中文歌") {
+                    continue; // 如果选择只查看中文歌，则跳过其他语言
+                }
+
+                const categoryHeader = document.createElement('div');
+                const lengthHeader = document.createElement('h3');
+                lengthHeader.textContent = `${category}:`;
+                categoryHeader.appendChild(lengthHeader);
+                songList.appendChild(categoryHeader);
+
+                if (category === "中文歌") {
+                    for (const length in songs[category]) {
+                        const lengthHeader = document.createElement('h4');
+                        lengthHeader.textContent = `${length} 字歌曲:`;
+                        songList.appendChild(lengthHeader);
+
+                        const songRow = document.createElement('div');
+                        songRow.className = 'songRow';
+
+                        songs[category][length].forEach(song => {
+                            const songElement = createSongElement(song, category);
+                            songRow.appendChild(songElement);
+                        });
+
+                        songList.appendChild(songRow);
+                    }
+                } else {
+                    const songRow = document.createElement('div');
+                    songRow.className = 'songRow';
+
+                    songs[category].forEach(song => {
+                        const songElement = createSongElement(song, category);
+                        songRow.appendChild(songElement);
+                    });
+
+                    songList.appendChild(songRow);
+                }
+            }
+        }
+
+        function createSongElement(song, category) {
+            const container = document.createElement('div');
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'checkbox';
+            checkbox.value = song;
+
+            const button = document.createElement('button');
+            button.textContent = song;
+            button.className = 'songButton';
+
+            button.onclick = function() {
+                const confirmCopy = confirm(`确定要复制 "${song}" 吗？`);
+                if (confirmCopy) {
+                    navigator.clipboard.writeText(song).then(() => {
+                        alert(`"${song}" 已复制到剪贴板`);
+                    });
+                }
+            };
+
+            button.oncontextmenu = function(event) {
+                event.preventDefault();
+                if (confirm(`确定要删除 "${song}" 吗？`)) {
+                    deleteSong(song, category);
+                }
+            };
+
+            container.appendChild(checkbox);
+            container.appendChild(button);
+            return container;
+        }
+
+        function toggleMoveContainer() {
+            const moveContainer = document.getElementById('moveContainer');
+            moveContainer.style.display = moveContainer.style.display === 'none' || moveContainer.style.display === '' ? 'block' : 'none';
+        }
+
+        function moveSelectedSongs() {
+            const moveSelect = document.getElementById('moveSelect');
+            const newCategory = moveSelect.value;
+
+            if (!newCategory) {
+                alert('请选择目标分类');
+                return;
+            }
+
+            const checkboxes = document.querySelectorAll('.checkbox:checked');
+            checkboxes.forEach(checkbox => {
+                const song = checkbox.value;
+                const category = detectLanguage(song);
+                deleteSong(song, category);
+                addSongToCategory(song, newCategory);
+            });
+
+            moveSelect.value = ""; // 重置选择
+            displaySongs();
+        }
+
+        function deleteSong(song, category) {
+            if (category === "中文歌") {
+                const length = song.length > 7 ? '多字' : song.length;
+                songs[category][length] = songs[category][length].filter(s => s !== song);
+                if (songs[category][length].length === 0) {
+                    delete songs[category][length];
+                }
+            } else {
+                songs[category] = songs[category].filter(s => s !== song);
+            }
+            displaySongs();
+        }
+
+        function exportSongs() {
+            let allSongs = [];
+
+            for (const category in songs) {
+                if (category === "中文歌") {
+                    for (const length in songs[category]) {
+                        allSongs = allSongs.concat(songs[category][length]);
+                    }
+                } else {
+                    allSongs = allSongs.concat(songs[category]);
+                }
+            }
+
+            const blob = new Blob([allSongs.join('\n')], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'songs.txt';
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+    </script>
+
+</body>
 </html>
